@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import ProductCard from "./components/ProductCard";
 import Pagination from "./components/Pagination";
+import AddToCartModal from "./components/AddToCartModal";
+
 import { fetchProducts } from "./services/productService";
 
 const PRODUCTS_PER_PAGE = 8;
@@ -13,6 +15,10 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
+
+  // Modal state
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const totalPages = Math.ceil(totalProducts / PRODUCTS_PER_PAGE);
 
@@ -51,7 +57,17 @@ function App() {
     return () => {
       controller.abort();
     };
-  }, [currentPage]);
+  }, [currentPage, retryCount]);
+
+  // Add product to cart
+  const handleAddToCart = (product) => {
+    setSelectedProduct(product);
+  };
+
+  // Close modal
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+  };
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
@@ -94,7 +110,7 @@ function App() {
           <div className="error-message">
             <p>{error}</p>
 
-            <button onClick={() => setCurrentPage((page) => page)}>
+            <button onClick={() => setRetryCount((count) => count + 1)}>
               Retry
             </button>
           </div>
@@ -104,7 +120,11 @@ function App() {
           <>
             <div className="product-grid">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                />
               ))}
             </div>
 
@@ -122,6 +142,12 @@ function App() {
           </>
         )}
       </main>
+
+      <AddToCartModal
+        isOpen={Boolean(selectedProduct)}
+        product={selectedProduct}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }
