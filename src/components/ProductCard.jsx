@@ -1,4 +1,4 @@
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onAddToCart }) => {
   return (
     <div className="product-card">
       <div className="product-image">
@@ -18,7 +18,14 @@ const ProductCard = ({ product }) => {
           <span className="product-rating">⭐ {product.rating}</span>
         </div>
 
-        <button className="add-button">View Product</button>
+        <button
+          type="button"
+          className="add-button"
+          onClick={() => onAddToCart(product)}
+          aria-label={`Add ${product.title} to cart`}
+        >
+          <span aria-hidden="true">+</span> Add to Cart
+        </button>
       </div>
     </div>
   );
